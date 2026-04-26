@@ -1,22 +1,6 @@
 import threading
 import os
 from http.server import HTTPServer, BaseHTTPRequestHandler
-class HealthHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"OK")
-    def log_message(self, format, *args):
-        pass
-
-port = int(os.environ.get("PORT", 8080))
-health_thread = threading.Thread(
-    target=lambda: HTTPServer(('0.0.0.0', port), HealthHandler).serve_forever(),
-    daemon=True
-)
-health_thread.start()
-print(f"✅ Health server running on port {port}")
-
 import json
 from dotenv import load_dotenv
 from groq_helper import call_groq, call_groq_simple, classify_user_intent
