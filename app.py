@@ -2,6 +2,8 @@ import json
 import os
 from dotenv import load_dotenv
 from groq_helper import call_groq, call_groq_simple, classify_user_intent
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
 # slack imports
 from slack_bolt import App
@@ -11,8 +13,22 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 import requests  # Python library for makin any HTTP requests, used to interact with the Jira API.
 from requests.auth import (HTTPBasicAuth)  # to ahndle basic auth when making requests to the Jira API. It allows you to provide your Jira email and API token for authentication.
 
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"OK")
+    def log_message(self, format, *args):
+        pass
+
+threading.Thread(
+    target=lambda: HTTPServer(('0.0.0.0', 8080), HealthHandler).serve_forever(),
+    daemon=True
+).start()
+
 # load environment variables from .env file
 load_dotenv()
+
 
 
 # Slack values
